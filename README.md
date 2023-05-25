@@ -10,4 +10,4 @@ O exercício consiste em responder 3 questões práticas de econometria e análi
 | 2º   | [R](https://github.com/viniventur/Exercicio-Econometrico/blob/main/Exer-Econometrico.R)   |
 | 3º   | [Python](https://github.com/viniventur/Exercicio-Econometrico/blob/main/Exe_Econometrico.ipynb) |
 
-Além disto, foi feito o relatório do trabalho no R Markdown para [PDF](https://github.com/viniventur/Exercicio-Econometrico/blob/main/Exe-Econometrico-PDF.Rmd) e para HTML [publicado no Rpubs](https://rpubs.com/viniventur/exereconometrico) e com [arquivo](https://github.com/viniventur/Exercicio-Econometrico/blob/main/Exe-Econometrico-HTML.Rmd) contido neste repositório.
+Além disto, foi feito o relatório do trabalho no R Markdown para [PDF](https://github.com/viniventur/Exercicio-Econometrico/blob/main/R%20Markdown/Exe-Econometrico-PDF.Rmd) e para HTML [publicado no Rpubs](https://rpubs.com/viniventur/exereconometrico) e com [arquivo](https://github.com/viniventur/Exercicio-Econometrico/blob/main/R%20Markdown/Exe-Econometrico-HTML.Rmd) contido neste repositório.
