@@ -1,0 +1,463 @@
+---
+title: "Exercício Econométrico"
+author: "Vinícius Ventura"
+output: 
+  pdf_document:
+    toc: true
+always_allow_html: true
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+library(tseries)
+library(openxlsx)  
+library(dplyr)
+library(psych)
+library(ggplot2)
+library(readxl)
+library(psych)
+library(gmodels)
+use_python("C:/Users/Robson Ventura/anaconda3/python.exe")
+```
+
+### Link para os scripts das 3 questões (STATA, R e Python):
+
+```{r echo=FALSE}
+linkstata <- sprintf("[%s](%s)", "Do-file", "https://drive.google.com/file/d/1HCJmh80yaYX5_t84QCdYfwYX_kSrakrT/view?usp=share_link")
+linkr <- sprintf("[%s](%s)", "R Script", "https://drive.google.com/file/d/1T43kd7b4jVJ89hBZFwU8c02LiTcEou2a/view?usp=share_link")
+linkrmd <- sprintf("[%s](%s)", "R Markdown", "https://drive.google.com/drive/folders/1z8xSODSmfzy0UYORcbpAWEhBjdH_ZfB_?usp=share_link")
+linkpython <- sprintf("[%s](%s)", "Google Colab", "https://colab.research.google.com/drive/1SC7usB5VWrhVoOEcaGV0NH3QcsXOHSGb?usp=sharing")
+# Dados da tabela
+dados <- data.frame(Questão = c("R Markdown", "Questão 1 - STATA", "Questão 2 - R", "Questão 3 - Python (Google Colab)"),
+                    Link = c(linkrmd, linkstata, linkr, linkpython))
+                    
+knitr::kable(dados, border = "solid", full_width = FALSE)
+```
+
+## Questão 1 - Stata
+
+### a) Regressão
+
+Importando os dados
+
+```{stata, eval=FALSE}    
+* Definindo o diretório onde o stata irá trabalhar *
+cd "C:\Users\Robson Ventura\OneDrive\Trabalhos\Econometria - Stata\Exe - AB2 -
+Econometria 2\Resultados"
+
+*Importando os dados*
+
+use http://www.stata.com/data/jwooldridge/eacsap/fertil2.dta
+
+save exereconometrico.dta, replace
+```
+
+#### Primeiramente, tanto para a questão 1 quanto 3.1 foram renomeadas algumas variáveis, resultando na relação a seguir:
+
+```{r echo=FALSE}
+varsstata <- readxl::read_excel("C:/Users/Robson Ventura/OneDrive/Trabalhos/Econometria - R/Atividade AB2/Resultados/tabelavariaveisstata.xlsx")
+knitr::kable(varsstata, border = "solid", full_width = FALSE)
+```
+
+Código de renomeação no STATA:
+
+```{stata, eval=FALSE}         
+rename children cria
+rename electric elet
+rename urban urb
+
+label variable cria "Número de filhos vivos"
+label variable age "Idade da mãe em anos"
+label variable agesq "Idade da mãe em anos ao quadrado"
+label variable educ "Anos de educação"
+label variable elet "Possui eletricidade"
+label variable urb "Vive em área urbana"
+```
+
+Código de renomeação no Python:
+
+```{python, eval=FALSE}          
+df = df.rename(columns={'children': 'cria' ,'electric': 'elet' ,'urban': 'urb'})
+```
+
+#### Regressão
+
+```      
+reg cria age agesq
+```
+
+<center>**Quadro 1 - Regressão com todas as variáveis do modelo**</center>
+
+```{r echo=FALSE}
+knitr::kable(read.csv("C:/Users/Robson Ventura/OneDrive/Trabalhos/Econometria - R/Atividade AB2/Resultados/quadro1rmdcsv.csv", sep=";"))
+```
+
+A partir dos resultados da regressão com 4358 observações, primeiramente, com base no R² ajustado, podemos afirmar que o modelo explica cerca de 57% da variável dependente *cria*. Já vendo a significância estatística das variáveis, vemos primeiramente que, de acordo com o valor-p do teste F, rejeitamos a hipótese nula que os coeficientes conjuntamente são estatisticamente iguais a 0. Analisando similarmente os testes t e valores-p de cada variável, notamos que, *a priori*, todos os coeficientes são estatisticamente significantes ao nível de significância de 1%, tendo valores dos testes t em módulo acima de 2 e valores-p abaixo de 0,01.
+
+Analisando os coeficientes, podemos afirmar que as variáveis de educação, eletricidade, e residência em área urbana afetam negativamente a quantidade de filhos vivos, podendo ser explicada teoricamente com o seguinte raciocínio: quanto mais bem estruturada for a moradia da mãe, estiver em área urbana e tiver mais anos de educação, menos filhos em média ela terá. Isto *ceteris paribus*, pois, analisando por exemplo a idade da mãe, vemos uma relação em média positiva com a quantidade dos filhos mantendo constante as demais variáveis.
+
+Ademais, vale dar destaque as variáveis *dummys*, as variáveis *elet* e *urb*, estas duas trazem análise categórica da variável *cria* com base em elementos de condições de vida e moradia, sendo, de acordo com os resultados, os coeficientes -0,31 e -0,2 respectivamente, portanto, ter eletricidade e viver em área urbana diminuem nestas respectivas proporções em média a quantidade de filhos vivos.
+
+### b) Matriz de Correlação e FIV
+
+```{stata, eval=FALSE}         
+correlate cria age agesq educ elet urb
+matrix corrmatriz = r(C)
+heatplot corrmatriz, values(format(%4.2f)) color(hcl diverging, intensity(.7))
+```
+
+<center>**Gráfico de calor da matriz de correlação entre as variáveis**</center>
+
+![](C:/Users/Robson%20Ventura/OneDrive/Trabalhos/Econometria%20-%20Stata/Exe%20-%20AB2%20-%20Econometria%202/Resultados/matrizcorrela%C3%A7%C3%A3o.png)
+
+Pois bem, analisando o gráfico da matriz de correlação, podemos ver que as variáveis *age* e *agesq* possuem correlação positiva com a variáveis *cria*, como ressaltado anteriormente a partir dos resultados da regressão. Seguindo a lógica que quanto mais velha a mãe mais filhos em média ela tem mantendo tudo mais constante. Seguindo isto, com o comando *VIF* obtemos a análise do FIV.
+
+```{stata, eval=FALSE}         
+VIF
+```
+
+#### Teste
+ 
+<center>**Fator de Inflação de Variância (FIV)**</center>
+
+```{r echo=FALSE}
+knitr::kable(readxl::read_excel("C:/Users/Robson Ventura/OneDrive/Trabalhos/Econometria - R/Atividade AB2/Resultados/fivantesexcel.xlsx"))
+```
+
+Como podemos ver, a média do FIV deu acima de 10, muito por causa das duas variáveis com multicolinearidade perfeita, portanto, foi estimado o modelo sem uma das duas, já que, relativamente, elas trazem interpretações semelhantes, assim, a variável escolhida para permanecer foi a *age* que representa a idade da mãe em anos. Rodando a regressão e o FIV novamente sem a variável *agesq* temos os seguintes resultados:
+
+```{stata, eval=FALSE}         
+reg cria age educ elet urb
+vif
+```
+
+#### Resolvendo
+
+<center>**Regressão sem a variável agesq**</center>
+
+```{r echo=FALSE}
+knitr::kable(read.csv("C:/Users/Robson Ventura/OneDrive/Trabalhos/Econometria - R/Atividade AB2/Resultados/quadro2csv.csv", sep=";"))
+```
+
+<center>**Fator de Inflação de Variância (FIV) - sem *agesq***</center>
+
+```{r echo=FALSE}
+knitr::kable(read.csv("C:/Users/Robson Ventura/OneDrive/Trabalhos/Econometria - R/Atividade AB2/Resultados/fivdepoiscsv.csv", sep=";"))
+```
+
+Pois bem, neste caso, é evidenciado uma diminuição no valor médio do FIV fazendo-nos aceitar a hipótese nula de não multicolinearidade.
+
+### c) Teste White e BPG para verificar a presença de heterocedasticidade
+
+#### Verificação dos Resíduos
+
+```{stata, eval=FALSE}         
+rvfplot, yline(0)
+```
+
+<center>**Distribuição dos resíduos**</center>
+
+![](C:/Users/Robson%20Ventura/OneDrive/Trabalhos/Econometria%20-%20Stata/Exe%20-%20AB2%20-%20Econometria%202/Resultados/constuhat.png)
+
+Com base no gráfico anterior, é evidente que a variância dos erros não são constantes, aumentando sua dispersão ao longo do gráfico. Para irmos além da análise gráfica, segue os testes BP e White para heterocedasticidade.
+
+#### Testes
+
+```{stata, eval=FALSE}         
+hettest
+```
+
+<center>**Teste de Breusch-Pagan**</center>
+
+| Análise    | Resultado |
+|------------|-----------|
+| chi2(4)    | 2140,57   |
+| Prob\>chi2 | 0,00      |
+
+```{stata, eval=FALSE}         
+imtest, white
+```
+
+<center>**Teste White**</center>
+
+| Fonte              | chi2    | df     | p    |
+|--------------------|---------|--------|------|
+| Heteroskedasticity | 1124,69 | 12.000 | 0,00 |
+
+Com base nos resultados dos dois testes, rejeitamos a hipótese nula de homocedasticidade pelo baixo valor-p dos dois, ficando abaixo de 0,01. Deste modo, temos a evidências que temos problema de heterocedasticidade, ou seja, variância não constante dos resíduos.
+
+Para correção do modelo, foi usado o comando \*robust\* referente a correção de White, a qual ajusta os desvios padrões com base na variância dos erros, trazendo estimativas mais precisas na presença de heterocedasticidade.
+
+#### Resolvendo
+
+```{stata, eval=FALSE}         
+reg cria age educ elet urb, robust
+```
+
+<center>**Regressão com Robust para ajustamento com base nos erros**</center>
+
+```{r echo=FALSE}
+knitr::kable(read.table("C:/Users/Robson Ventura/OneDrive/Trabalhos/Econometria - R/Atividade AB2/Resultados/regrobustcsv2.txt", sep=";", header=TRUE))
+```
+
+## Questão 2 - R
+
+### a) Importando dados
+
+#### a.1) Instalando e importando os pacotes usados
+
+```         
+install.packages("dplyr") 
+install.packages("ggplot2")
+install.packages("readxl")
+install.packages("psych")
+install.packages("openxlsx")
+install.packages("gmodels")
+install.packages("tseries")
+library(tseries)
+library(openxlsx)  
+library(dplyr)
+library(psych)
+library(ggplot2)
+library(readxl)
+library(gmodels)
+```
+
+#### a.2) Importando os dados
+
+```{r}
+df <- read_excel("C:/Users/Robson Ventura/OneDrive/Trabalhos/Econometria - R/Atividade AB2/data_prova.xls")
+View(df)
+```
+
+```{r echo=FALSE}
+knitr::kable(head(df,5))
+```
+
+**Filtrando por Alagoas**
+
+```{r}
+al <- subset(df, df$uf == 27 & df$ano == 2010)
+View(al)
+```
+
+```{r echo=FALSE}
+knitr::kable(head(al,5))
+```
+
+### b) Análise Descritiva
+
+#### b.1) Análise geral
+
+```         
+summary(al[c('analf','pobre', 'poptot', 'popurb', 'rpc', 'esgag_inad')])
+```
+
+```{r echo=FALSE}
+knitr::kable(summary(al[c('analf','pobre', 'poptot', 'popurb', 'rpc', 'esgag_inad')]))
+```
+
+Analisando as variáveis em geral, podemos ver que o estado possui médias, tanto das variáveis de analfabetismo quanto de pobreza, bastante altas, visto que, em média, a taxa de pobreza dos municípios do estado é 46,94%. Tal dado tem bastante correlação com a renda per capita da população, a qual em média é R$ 251,20, tendo o mínimo em R$ 151,60, referente ao município de Olho d'Água Grande, valor substancialmente baixo. Já analisando as demais variáveis, vemos que em média, 20,24% da população alagoana não possui tratamento de esgoto adequado, isto sendo que cerca de 25% dos municípios de Alagoas possuem uma porcentagem de esgoto inadequado igual ou inferior a 8,102.
+
+De acordo com a tabela, a variável _analf_ pode ser explicada através da relação pobreza e renda per capita. De modo que, quanto maior for a renda per capita menor será a taxa de pobreza e analfabetismo, respectivamente.  Em Alagoas a taxa média de pobreza corresponde a 45,94%, ou seja, cerca da metade dos municípios apresentam condições de vulnerabilidade social, logo esse dado é um reflexo do índice de analfabetismo que alcança uma média 32,56% para o ano em análise, e renda média de R$251,20 por pessoa.Podemos visualizar como a variável se distribui de acordo com sua frequência com o gráfico a seguir.
+
+<center>**Gráfico de frequência de analfabetismo - Alagoas em 2010**</center>
+```{r}
+hist(al$analf, 
+     main = "", 
+     xlab = "Taxa de Analfabetismo",
+     ylab = "Frequência")
+```
+
+Conforme demonstrado, é evidente uma maior concentração a partir da faixa dos 30%.
+
+### c) Criação de variável categórica para analfabetismo
+
+```         
+cortes <- quantile(al$analf, probs = c(0, 0.05, 0.5, 1))
+cortes
+al$sitanalf <- cut(al$analf, 
+                   cortes, labels=c("bom", "regular", "ruim"),
+                   right=FALSE)
+head(al,5)
+```
+
+```{r echo=FALSE}
+cortes <- quantile(al$analf, probs = c(0, 0.05, 0.5, 1))
+al$sitanalf <- cut(al$analf, 
+                   cortes, labels=c("bom", "regular", "ruim"),
+                   right=FALSE)
+knitr::kable(head(al,5))
+```
+
+### d) Análise da sitanalf
+
+#### d.1) Criação da variável filtrada para os municípios com a situação "bom"
+
+```         
+analfbom <- subset(al, al$sitanalf=='bom')
+head(analfbom,5)
+```
+
+```{r echo=FALSE}
+analfbom <- subset(al, al$sitanalf=='bom')
+knitr::kable(head(analfbom,5))
+```
+
+#### d.2) Criação da variável filtrada para os municípios com a situação "ruim"
+
+```         
+analfruim <- subset(al, al$sitanalf=='ruim')
+head(analfruim,5)
+```
+
+```{r echo=FALSE}
+analfruim <- subset(al, al$sitanalf=='ruim')
+knitr::kable(head(analfruim,5))
+```
+
+Analisando a variável categórica, vemos que 51 municípios são categorizados como ruim, 45 como regular e apenas 6 como bom. A tabela nos da os top 5 municípios em cada categoria, porém é bem relevante a pouca quantidade na categoria bom, ressaltando ainda mais a situação educacional do estado.
+
+### e) Criando variável de faixa populacional
+
+```         
+cortespop <- c(-Inf, 5000, 20000, 50000, 100000, Inf)
+al$fxpop <- cut(al$poptot, cortespop, labels=c(1,2,3,4,5), right=FALSE)
+head(al[, c("poptot", "fxpop")],5)
+```
+
+```{r echo=FALSE}
+cortespop <- c(-Inf, 5000, 20000, 50000, 100000, Inf)
+al$fxpop <- cut(al$poptot, cortespop, labels=c(1,2,3,4,5), right=FALSE)
+knitr::kable(head(al[, c("poptot", "fxpop")],5))
+```
+
+### f) Tabulação cruzada entre sitanalf e fxpop
+
+```         
+cross <- xtabs(~al$sitanalf + al$fxpop)
+popcross <- prop.table(cross, margin=1)*100
+round(popcross,2)
+```
+
+```{r echo=FALSE}
+cross <- xtabs(~al$sitanalf + al$fxpop)
+popcross <- prop.table(cross, margin=1)*100
+knitr::kable(round(popcross,2))
+```
+
+Já ao analisar as duas variáveis categóricas, vemos que, como já visto nas últimas demonstrações, estão inseridos, em maior quantidade, no grupo categorizado com taxa de analfabetismo "bom", os grupos 4 e 5 de faixa populacional, referentes a quantidades mais altas. Por outro lado, podemos ver que no grupo "ruim" temos maior parte no grupo de faixa populacional 2 e nenhuma porcentagem com os grupos 4 e 5. Esta análise facilita a visualização de que os municípios mais populosos possuem melhores condições educacionais.
+
+### g) Estatística descritiva da variável pobre por faixa populacional
+
+```
+describeBy(al$pobre, al$fxpop, digits = 2, skew=FALSE, ranges=FALSE)
+```
+
+```{r echo=FALSE}
+describeBy(al$pobre, al$fxpop, digits = 2, skew=FALSE, ranges=FALSE)
+```
+
+A partir dessa análise, vemos que a média da taxa de pobreza do grupo com maiores populações é bem abaixo dos demais, dando destaque ao grupo 5 com, em média 21,11% e o grupo 1 com média de 45,33%, valores bastantes descrepantes. Além de que, vemos com os dados de desvio padrão que os dados também são mais dispersos do que dos grupos mais altos, porém, podemos verificar isto com melhor detalhes com coeficiente de variação.
+
+```
+cvpobre <- al %>%
+  group_by(fxpop) %>%
+  CV <- sd(pobre)/mean(pobre)*100
+  summarise(CV)
+  cvpobre
+cvpobre  
+```
+
+```{r echo=FALSE}
+cvpobre <- al %>%
+  group_by(fxpop) %>%
+  summarise(sd(pobre)/mean(pobre)*100)
+knitr::kable(cvpobre)
+```
+  
+Vendo o coeficiente de variação, observamos que embora o grupo 1 realmente tenha um coeficiente de 24,22%, o grupo 5 ultrapassa com um coeficiente maior, portanto, sendo mais dispersos em relação a média de 21,11%. Para melhorar a visualização dos dados, segue o gráfico a seguir da população por taxa de pobreza.
+  
+**Plotagem**
+
+```{r}
+plot(al$pobre, al$poptot, ylab="População", xlab="Taxa de Pobreza")
+```
+
+A partir deste gráfico, conseguimos ver com certeza a presença de um outlier com população muito elevada e taxa de pobreza mais baixa, o qual se refere ao município de Maceió. Ao analisarmos os demais municípios, vemos uma concentração da taxa de pobreza em municípios com população baixa, os quais são referentes a municípios menores com menor comércio, renda per capita, além de menos arrecadação, investimento e, consequentemente, políticas públicas e geração de emprego.
+
+### h) Box plot de pobreza por faixa populacional
+
+```{r}
+boxplot(pobre~fxpop, al, xlab='Faixa populacional', ylab='Taxa de Pobreza')
+```
+
+Ao analisarmos o gráfico, podemos confirmar a grande variação dos dados na faixa de população 5, além de vermos o movimento de queda da taxa de pobreza ao percorrermos municípios com cada vez maior população. Ao analisarmos os outliers, vemos que é detectado 1 no grupo de faixa populacional 1 e 2 no grupo 2, o qual também possui maior intervalo entre mínimos e máximos.
+
+### i) Criação de variável de urbanização
+
+```
+al$urb <- (al$popurb/al$poptot)*100
+al$rur <- (al$poprur/al$poptot)*100
+head(al[, c("poptot", "fxpop", "urb", "rur")],5)
+```
+
+```{r echo=FALSE}
+al$urb <- (al$popurb/al$poptot)*100
+al$rur <- (al$poprur/al$poptot)*100
+knitr::kable(head(al[, c("poptot", "fxpop", "urb", "rur")],5))
+```
+
+Com a variável de urbanização, podemos ver analisar o quanto que o município conter uma área urbana influencia as demais variáveis socieconômicas, na teoria, em áreas urbanas é mais provavél de ter municípios mais desenvolvidos e com melhores dados tanto econômicos como educacionais.
+
+### j) Regressão com pobre como variável dependente
+
+```{r}
+reg <- lm(pobre~urb, al)
+print(summary(reg))
+```
+
+Ao rodar a regressão linear pelo método dos mínimos quadrados ordinários, podemos inferir, ao analisar a variável de urbanização, que uma variação de 1 ponto percentual diminui, em média, a pobreza em 0,32 (valores absolutos). Ao analisar o R², vemos que o modelo explica 55,18% dos dados, visto que temos apenas uma variável no modelo, trazendo um modelo mal especificado. Ao analisar a significância estatística da variável, vemos que _urb_ é estatisticamente significante ao nível de 1%.
+
+### k) Gerando os resíduos e fazendo o teste de Jarque-Bera
+
+#### k.1) Gerando os resíduos
+
+```
+uhat <- reg$residuals
+hist(reg$residuals, xlab='Resíduos', ylab='Frequência', main='')
+```
+
+```{r echo=FALSE}
+uhat <- reg$residuals
+hist(reg$residuals, xlab='Resíduos', ylab='Frequência', main='')
+```
+
+Ao fazermos a análise gráfica da distribuição dos resíduos, vemos que eles, aparententemente, possuem uma distribuição normal, tanto visto o histograma anterior quanto ao analisarmos o gráfico Q-Q, o qual nos traz a análise da normalidade dos resíduos a partir de uma linha a 45º da origem, quanto mais alinhado mais normal é a distribuição.
+
+```
+qqnorm(reg$residuals, pch = 1, frame = FALSE, main='')
+qqline(reg$residuals, col = "red", lwd = 2)
+```
+
+```{r echo=FALSE}
+qqnorm(reg$residuals, pch = 1, frame = FALSE, main='')
+qqline(reg$residuals, col = "red", lwd = 2)
+```
+
+Portanto, para fazer um teste acertivo, segue o teste de Jarque-Bera de normalidade dos resíduos.
+
+#### k.2) Teste de Jarque-Bera
+
+```{r}
+testejb <- jarque.bera.test(uhat)
+print(testejb)
+```
+
+Conforme o resultado do teste (valor-p acima de 0,1), aceitamos a hipótese nula de que os resíduos são normalmente distribuídos. 
+
+## Questão 3 - Pýthon
+
+<center>[Link Google Colab](https://colab.research.google.com/drive/1SC7usB5VWrhVoOEcaGV0NH3QcsXOHSGb?usp=sharing)</center>
