@@ -1,8 +1,8 @@
 # Exercício Econométrico
 
-Este é um trabalho advindo da matéria de **Econometria 2** ministrada pelo Prof. Dr. Keuler Hissa Teixeira.
+Este é um trabalho advindo da matéria de **Econometria 2**.
 
-O exercício consiste em responder 3 questões práticas de econometria e análise de dados, sendo cada uma com uma lingaguem de programação diferente conforme a divisão a seguir:
+O exercício consiste em responder 3 questões práticas de econometria e análise de dados, sendo cada uma com uma linguagem de programação diferente conforme a divisão a seguir:
 
 | Questão | Linguagem|
 | -------- | -------- | 
