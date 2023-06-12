@@ -1,6 +1,6 @@
 ---
 title: "Exercício Econométrico"
-author: "Vinícius Ventura"
+author: "[Vinícius Ventura](https://github.com/viniventur/)"
 output:
   html_document: 
     highlight: textmate
@@ -28,9 +28,9 @@ use_python("C:/Users/Robson Ventura/anaconda3/python.exe")
 ### Link para os scripts das 3 questões (STATA, R e Python):
 
 ```{r echo=FALSE}
-linkstata <- sprintf("[%s](%s)", "Do-file", "https://drive.google.com/file/d/1HCJmh80yaYX5_t84QCdYfwYX_kSrakrT/view?usp=share_link")
-linkr <- sprintf("[%s](%s)", "R Script", "https://drive.google.com/file/d/1T43kd7b4jVJ89hBZFwU8c02LiTcEou2a/view?usp=share_link")
-linkrmd <- sprintf("[%s](%s)", "R Markdown", "https://drive.google.com/drive/folders/1z8xSODSmfzy0UYORcbpAWEhBjdH_ZfB_?usp=share_link")
+linkstata <- sprintf("[%s](%s)", "Do-file", "https://github.com/viniventur/Exercicio-Econometrico/blob/main/DOFILE-Exe-econometrico.do")
+linkr <- sprintf("[%s](%s)", "R Script", "https://github.com/viniventur/Exercicio-Econometrico/blob/main/Exer-Econometrico.R")
+linkrmd <- sprintf("[%s](%s)", "R Markdown", "https://github.com/viniventur/Exercicio-Econometrico/tree/main/R%20Markdown")
 linkpython <- sprintf("[%s](%s)", "Google Colab", "https://colab.research.google.com/drive/1SC7usB5VWrhVoOEcaGV0NH3QcsXOHSGb?usp=sharing")
 # Dados da tabela
 dados <- data.frame(Questão = c("R Markdown", "Questão 1 - STATA", "Questão 2 - R", "Questão 3 - Python (Google Colab)"),
