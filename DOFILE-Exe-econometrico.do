@@ -1,6 +1,6 @@
 /*
 Exercício Econométrico - AB1 - Econometria 2
-Alunos: Vinícius Ventura
+Aluno: Vinícius Ventura
 */
 
 
