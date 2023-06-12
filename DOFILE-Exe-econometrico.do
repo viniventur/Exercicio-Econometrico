@@ -1,6 +1,6 @@
 /*
-Exercício Econométrico - AB2 - Econometria 2
-Alunos: Vinícius Ventura e Joyce Nascimento
+Exercício Econométrico - AB1 - Econometria 2
+Alunos: Vinícius Ventura
 */
 
 
